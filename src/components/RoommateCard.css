@@ -1,0 +1,74 @@
+/* src/components/RoommateCard.css */
+@keyframes fadeIn {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.rm-card {
+  --i: 0;
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+  animation-delay: calc(var(--i) * 0.1s);
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  margin: 12px;
+  width: 220px;
+  transition: transform .2s, box-shadow .2s;
+}
+.rm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.rm-card h3 {
+  margin: 0 0 8px;
+  color: var(--primary);
+}
+.rm-card p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.rm-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  margin: 12px;
+  width: 220px;
+  transition: transform .2s, box-shadow .2s;
+}
+.rm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.rm-card h3 {
+  margin: 0 0 8px;
+  color: #1abc9c;
+}
+.rm-card p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+@keyframes fadeIn {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.rm-card {
+  --i: 0;
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+  animation-delay: calc(var(--i) * 0.1s);
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  margin: 12px;
+  width: 220px;
+  transition: transform .2s, box-shadow .2s;
+}
+
