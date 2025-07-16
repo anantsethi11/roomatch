@@ -1,19 +1,21 @@
+// src/components/Navbar.js
 import React from 'react';
-import { FaUserCircle } from 'react-icons/fa';
-import './Navbar.css';
+import { FaHome } from 'react-icons/fa';
 
 export default function Navbar() {
   return (
-    <nav className="navbar">
-      <div className="logo">RooMatch</div>
-      <ul className="nav-links">
-        <li><a href="#find">Find</a></li>
-        <li><a href="#post">Post</a></li>
-        <li><a href="#about">About</a></li>
-      </ul>
-      <button className="login-btn">
-        <FaUserCircle /> Login
-      </button>
+    <nav className="bg-white shadow-md">
+      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <FaHome className="text-primary text-2xl" />
+          <span className="font-bold text-xl text-primary">RooMatch</span>
+        </div>
+        <ul className="flex space-x-4 text-text">
+          <li><a href="#hero" className="hover:text-primary transition">Home</a></li>
+          <li><a href="#form" className="hover:text-primary transition">List</a></li>
+          <li><a href="#auth" className="hover:text-primary transition">Login</a></li>
+        </ul>
+      </div>
     </nav>
   );
 }

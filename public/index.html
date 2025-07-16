@@ -24,6 +24,24 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+        <!-- Tailwind via CDN – no build step required -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Optional: Extend your theme
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1abc9c',
+            accent:  '#e74c3c',
+            bgLight: '#f9f9f9',
+            text:    '#333',
+          }
+        }
+      }
+    }
+  </script>
+
     <title>React App</title>
   </head>
   <body>

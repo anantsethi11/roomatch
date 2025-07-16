@@ -1,22 +1,28 @@
+// src/components/RoommateList.js
 import React, { useState } from 'react';
-import roommates from '../data/roommates';
+import defaultRoommates from '../data/roommates';
 import RoommateCard from './RoommateCard';
 import './RoommateList.css';
 
-export default function RoommateList() {
-  // filter state
+export default function RoommateList({ customData }) {
+  // 1. State for filters
   const [filterCity, setFilterCity] = useState('');
   const [minBudget, setMinBudget] = useState('');
   const [maxBudget, setMaxBudget] = useState('');
 
-  // city dropdown options
-  const cities = [...new Set(roommates.map(r => r.city))];
+  // 2. Use customData if provided, else defaultRoommates
+  const data = Array.isArray(customData) && customData.length
+    ? customData
+    : defaultRoommates;
 
-  // apply filters
-  const filtered = roommates.filter(r => {
+  // 3. Unique cities for dropdown
+  const cities = [...new Set(data.map(r => r.city))];
+
+  // 4. Apply filters
+  const filtered = data.filter(r => {
     const matchesCity = filterCity ? r.city === filterCity : true;
-    const matchesMin = minBudget ? r.budgetMax >= Number(minBudget) : true;
-    const matchesMax = maxBudget ? r.budgetMin <= Number(maxBudget) : true;
+    const matchesMin  = minBudget   ? r.budgetMax >= Number(minBudget) : true;
+    const matchesMax  = maxBudget   ? r.budgetMin <= Number(maxBudget) : true;
     return matchesCity && matchesMin && matchesMax;
   });
 
