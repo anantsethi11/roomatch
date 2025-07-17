@@ -1,40 +1,129 @@
-import React, { useState } from 'react';
-import './ProfileForm.css';
+import React, { useState }         from 'react';
+import { motion }                  from 'framer-motion';
+import { auth, db }                from '../firebase';
+import { doc, setDoc }             from 'firebase/firestore';
+import { updateProfile }           from 'firebase/auth';
 
-export default function ProfileForm({ onAdd }) {
-  const [name, setName] = useState('');
-  const [city, setCity] = useState('');
-  const [budgetMin, setBudgetMin] = useState('');
-  const [budgetMax, setBudgetMax] = useState('');
-  const [hobbies, setHobbies] = useState('');
+export default function ProfileForm({ user }) {
+  const [displayName, setDisplayName] = useState('');
+  const [age, setAge]                 = useState('');
+  const [location, setLocation]       = useState('');
+  const [budget, setBudget]           = useState('');
+  const [error, setError]             = useState('');
+  const [loading, setLoading]         = useState(false);
 
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !city) return alert('Please fill required fields');
+    setError('');
+    setLoading(true);
 
-    onAdd({
-      id: Date.now(),
-      name,
-      city,
-      budgetMin: Number(budgetMin),
-      budgetMax: Number(budgetMax),
-      hobbies: hobbies.split(',').map(h => h.trim())
-    });
+    try {
+      // Update Firebase Auth
+      await updateProfile(auth.currentUser, { displayName });
 
-    setName(''); setCity(''); setBudgetMin(''); setBudgetMax(''); setHobbies('');
-  }
+      // Write profile doc with budget
+      await setDoc(doc(db, 'profiles', user.uid), {
+        displayName,
+        age: Number(age),
+        location,
+        budget,
+        email: user.email,
+        uid: user.uid,
+        createdAt: new Date()
+      });
+
+      setLoading(false);
+      window.location.reload();
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   return (
-    <form className="profile-form" onSubmit={handleSubmit}>
-      <h3>Add Your Roommate Profile</h3>
+    <motion.div
+      className="w-full max-w-md mx-auto my-12 p-6 bg-white rounded-lg shadow-lg"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <h2 className="text-2xl font-bold text-center mb-6">
+        Complete Your Profile
+      </h2>
 
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" required />
-      <input value={city} onChange={e => setCity(e.target.value)} placeholder="City" required />
-      <input type="number" value={budgetMin} onChange={e => setBudgetMin(e.target.value)} placeholder="Min Budget ₹" />
-      <input type="number" value={budgetMax} onChange={e => setBudgetMax(e.target.value)} placeholder="Max Budget ₹" />
-      <input value={hobbies} onChange={e => setHobbies(e.target.value)} placeholder="Hobbies (comma-separated)" />
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-      <button type="submit">Post Profile</button>
-    </form>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-gray-700">
+            Display Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            required
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className="w-full mt-1 px-3 py-2 border rounded-lg
+                       focus:ring-primary focus:border-primary"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="age" className="block text-gray-700">
+            Age
+          </label>
+          <input
+            id="age"
+            type="number"
+            required
+            min="18"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            className="w-full mt-1 px-3 py-2 border rounded-lg
+                       focus:ring-primary focus:border-primary"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="location" className="block text-gray-700">
+            City / Area
+          </label>
+          <input
+            id="location"
+            type="text"
+            required
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full mt-1 px-3 py-2 border rounded-lg
+                       focus:ring-primary focus:border-primary"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="budget" className="block text-gray-700">
+            Budget (per month)
+          </label>
+          <input
+            id="budget"
+            type="text"
+            required
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+            className="w-full mt-1 px-3 py-2 border rounded-lg
+                       focus:ring-primary focus:border-primary"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full px-4 py-2 bg-primary text-white rounded-lg
+                     hover:bg-primary/90 transition disabled:opacity-50"
+        >
+          {loading ? 'Saving…' : 'Save Profile'}
+        </button>
+      </form>
+    </motion.div>
   );
 }

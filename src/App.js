@@ -1,78 +1,97 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import { Routes, Route, Navigate }     from 'react-router-dom';
 
-import Navbar       from './components/Navbar';
-import Hero         from './components/Hero';
-import AuthForm     from './components/AuthForm';
-import ProfileForm  from './components/ProfileForm';
-import RoommateList from './components/RoommateList';
-
+import { onAuthStateChanged }           from 'firebase/auth';
 import {
-  db,
   auth,
+  db,
   collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  onAuthStateChanged
+  onSnapshot
 } from './firebase';
 
+import Navbar         from './components/Navbar';
+import Hero           from './components/Hero';
+import AuthForm       from './components/AuthForm';
+import ProfileForm    from './components/ProfileForm';
+import ProfileDetail  from './components/ProfileDetail';
+import RoommateList   from './components/RoommateList';
+import ChatRoom       from './components/ChatRoom';
+
 export default function App() {
-  const [user, setUser]       = useState(null);
+  const [user, setUser]         = useState(null);
   const [profiles, setProfiles] = useState([]);
 
-  // 1) Auth listener
+  // 1) Auth state listener
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, current => {
-      setUser(current);
-    });
+    const unsub = onAuthStateChanged(auth, setUser);
     return unsub;
   }, []);
 
-  // 2) Firestore listener
+  // 2) Firestore profiles subscription
   useEffect(() => {
-    const q = query(
-      collection(db, 'roommates'),
-      orderBy('createdAt', 'desc')
-    );
-    const unsub = onSnapshot(q, snap => {
-      setProfiles(
-        snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      );
+    const q = collection(db, 'profiles');
+    const unsub = onSnapshot(q, (snap) => {
+      setProfiles(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return unsub;
   }, []);
-
-  // 3) Add a new profile
-  async function handleAddProfile(profile) {
-    await addDoc(collection(db, 'roommates'), {
-      ...profile,
-      createdAt: new Date()
-    });
-  }
-  <div className="bg-primary min-h-screen text-white">
-  Testing Tailwind CDN…
-  </div>
 
   return (
-    <div className="App">
-      <Navbar />
-      <Hero />
-      <main className="container">
-        <AuthForm user={user} setUser={setUser} />
+    <div className="min-h-screen bg-bgLight text-text pt-16">
+      <Navbar user={user} />
 
-        {user && (
-          <>
-            <ProfileForm onAdd={handleAddProfile} />
-            <h2 className="section-title">
-              Available Roommates
-            </h2>
-            <RoommateList customData={profiles} />
-          </>
-        )}
-      </main>
+      <Routes>
+        {/* Home: Hero + AuthForm or Listings */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              {!user ? (
+                <AuthForm />
+              ) : !user.displayName ? (
+                <Navigate to="/profile" replace />
+              ) : (
+                <RoommateList
+                  profiles={profiles}
+                  currentUser={user}
+                />
+              )}
+            </>
+          }
+        />
+
+        {/* Complete your profile */}
+        <Route
+          path="/profile"
+          element={
+            user ? (
+              !user.displayName ? (
+                <ProfileForm user={user} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        {/* View someone’s profile */}
+        <Route
+          path="/profile/:uid"
+          element={<ProfileDetail />}
+        />
+
+        {/* Chat room */}
+        <Route
+          path="/chat/:chatId"
+          element={<ChatRoom />}
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }
