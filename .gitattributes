@@ -1,0 +1,6 @@
+# enforce LF in the repo for these platforms
+*.js     text eol=lf
+*.jsx    text eol=lf
+*.json   text eol=lf
+*.css    text eol=lf
+*.html   text eol=lf
